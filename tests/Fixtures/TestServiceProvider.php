@@ -14,7 +14,7 @@ class TestServiceProvider implements ServiceProviderInterface
     public function getFactories()
     {
         return [
-            'serviceA' => function (ContainerInterface $container) {
+            'serviceA' => function (ContainerInterface $container): \stdClass {
                 $instance = new \stdClass();
                 $instance->serviceB = $container->get('serviceB');
 
@@ -28,7 +28,7 @@ class TestServiceProvider implements ServiceProviderInterface
         ];
     }
 
-    public static function createServiceB(ContainerInterface $container)
+    public static function createServiceB(ContainerInterface $container): \stdClass
     {
         $instance = new \stdClass();
         // Test getting the database_host parameter.

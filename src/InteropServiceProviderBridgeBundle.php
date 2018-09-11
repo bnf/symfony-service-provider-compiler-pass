@@ -30,6 +30,7 @@ class InteropServiceProviderBridgeBundle extends Bundle implements RegistryProvi
 
     public function build(ContainerBuilder $container)
     {
+        parent::build($container);
         $container->addCompilerPass(new ServiceProviderCompilationPass($this->id, $this));
     }
 

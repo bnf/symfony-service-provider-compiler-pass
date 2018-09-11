@@ -12,7 +12,7 @@ class TestServiceProviderOverride2 implements ServiceProviderInterface
         return [];
     }
 
-    public static function overrideServiceA(ContainerInterface $container, $serviceA = null)
+    public static function overrideServiceA(ContainerInterface $container, $serviceA = null): \stdClass
     {
         $serviceA->newProperty2 = 'bar';
 

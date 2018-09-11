@@ -22,7 +22,9 @@ class ServiceProviderCompilationPassTest extends TestCase
 
         $container = new ContainerBuilder();
         $container->setParameter('database_host', 'localhost');
-        $container->setDefinition('logger', new Definition(NullLogger::class));
+        $logger = new Definition(NullLogger::class);
+        $logger->setPublic(true);
+        $container->setDefinition('logger', $logger);
 
         $bundle->build($container);
         $container->compile();

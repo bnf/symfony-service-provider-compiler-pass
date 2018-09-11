@@ -6,6 +6,7 @@ namespace TheCodingMachine\Interop\ServiceProviderBridgeBundle;
 
 use Interop\Container\ServiceProviderInterface;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -61,6 +62,7 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
     {
         $definition = new Definition(Registry::class);
         $definition->setSynthetic(true);
+        $definition->setPublic(true);
 
         $container->setDefinition('service_provider_registry_'.$this->registryId, $definition);
     }
@@ -68,6 +70,7 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
     private function registerAcclimatedContainer(ContainerBuilder $container) {
         $definition = new Definition('TheCodingMachine\\Interop\\ServiceProviderBridgeBundle\\SymfonyContainerAdapter');
         $definition->addArgument(new Reference("service_container"));
+        $definition->setPublic(true);
 
         $container->setDefinition('interop_service_provider_acclimated_container', $definition);
     }
@@ -89,36 +92,11 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
     }
 
     private function registerService($serviceName, $serviceProviderKey, $callable, ContainerBuilder $container) {
-        $factoryDefinition = $this->getServiceDefinitionFromCallable($serviceName, $serviceProviderKey, $callable);
-
-        $container->setDefinition($serviceName, $factoryDefinition);
+        $this->addServiceDefinitionFromCallable($serviceName, $serviceProviderKey, $callable, $container);
     }
 
     private function extendService($serviceName, $serviceProviderKey, $callable, ContainerBuilder $container) {
-        $factoryDefinition = $this->getServiceDefinitionFromCallable($serviceName, $serviceProviderKey, $callable, true);
-
-        if (!$container->has($serviceName)) {
-            $container->setDefinition($serviceName, $factoryDefinition);
-        } else {
-            // The new service will be created under the name 'xxx_decorated_y'
-            // The old service will be moved to the name 'xxx_decorated_y.inner'
-            // This old service will be accessible through a callback represented by 'xxx_decorated_y.callbackwrapper'
-            // The $servicename becomes an alias pointing to 'xxx_decorated_y'
-
-            $oldServiceName = $serviceName;
-            $serviceName = $this->getDecoratedServiceName($serviceName, $container);
-
-            $innerName = $serviceName.'.inner';
-            $innerDefinition = $container->findDefinition($oldServiceName);
-            $container->setDefinition($innerName, $innerDefinition);
-
-            $factoryDefinition->addArgument(new Reference($innerName));
-
-            $container->setDefinition($serviceName, $factoryDefinition);
-            $container->setDefinition($innerName, $innerDefinition);
-
-            $container->setAlias($oldServiceName, new Alias($serviceName));
-        }
+        $this->addServiceDefinitionFromCallable($serviceName, $serviceProviderKey, $callable, $container, true);
     }
 
     private function getDecoratedServiceName($serviceName, ContainerBuilder $container) {
@@ -126,26 +104,67 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
         while ($container->has($serviceName.'_decorated_'.$counter)) {
             $counter++;
         }
-        return $serviceName.'_decorated_'.$counter;
+        return [
+            $serviceName.'_decorated_'.$counter,
+            $counter === 1 ? $serviceName : $serviceName.'_decorated_'.($counter-1)
+        ];
     }
 
-    private function getServiceDefinitionFromCallable($serviceName, $serviceProviderKey, callable $callable, bool $extension = false)
+    private function addServiceDefinitionFromCallable($serviceName, $serviceProviderKey, callable $callable, ContainerBuilder $container, bool $extension = false)
     {
         /*if ($callable instanceof DefinitionInterface) {
             // TODO: plug the definition-interop converter here!
         }*/
-        $factoryDefinition = new Definition('Class'); // TODO: in PHP7, we can get the return type of the function!
+
+        $reflection = null;
+        if (is_array($callable)) {
+            $reflection = new \ReflectionMethod($callable[0], $callable[1]);
+        } elseif (is_object($callable)) {
+            if ($callable instanceof \Closure) {
+                $reflection = new \ReflectionFunction($callable);
+            } else {
+                $reflection = new \ReflectionMethod($callable, '__invoke');
+            }
+        } elseif (is_string($callable)) {
+            $reflection = new \ReflectionFunction($callable);
+        }
+
+        // If we cannot reflect a return type, assume the serviceName is the FQCN
+        $type = $reflection ? ((string) $reflection->getReturnType() ?: $serviceName) : $serviceName;
+
+        $innerName = null;
+        $decoratedServiceName = null;
+        $factoryDefinition = new Definition($type);
+        $factoryDefinition->setPublic(true);
+        if ($extension && $container->has($serviceName)) {
+            // TODO: Use a ChildDefinition? $factoryDefinition = new ChildDefinition($serviceName);
+            list($decoratedServiceName, $previousServiceName) = $this->getDecoratedServiceName($serviceName, $container);
+            $innerName = $decoratedServiceName . '.inner';
+
+            $factoryDefinition->setDecoratedService($previousServiceName, $innerName);
+        }
+
         $containerDefinition = new Reference('interop_service_provider_acclimated_container');
 
         if ((is_array($callable) && is_string($callable[0])) || is_string($callable)) {
             $factoryDefinition->setFactory($callable);
-            $factoryDefinition->addArgument(new Reference('interop_service_provider_acclimated_container'));
+            $factoryDefinition->addArgument($containerDefinition);
         } else {
             $registryMethod = $extension ? 'extendService' : 'createService';
             $factoryDefinition->setFactory([ new Reference('service_provider_registry_'.$this->registryId), $registryMethod ]);
             $factoryDefinition->addArgument($serviceProviderKey);
             $factoryDefinition->addArgument($serviceName);
             $factoryDefinition->addArgument($containerDefinition);
+        }
+
+        if ($innerName) {
+            $factoryDefinition->addArgument(new Reference($innerName));
+        }
+
+        if ($decoratedServiceName) {
+            $container->setDefinition($decoratedServiceName, $factoryDefinition);
+        } else {
+            $container->setDefinition($serviceName, $factoryDefinition);
         }
 
         return $factoryDefinition;

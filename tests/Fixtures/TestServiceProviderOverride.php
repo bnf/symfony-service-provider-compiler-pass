@@ -11,7 +11,7 @@ class TestServiceProviderOverride implements ServiceProviderInterface
         return [];
     }
 
-    public static function overrideServiceA(ContainerInterface $container, \stdClass $serviceA = null)
+    public static function overrideServiceA(ContainerInterface $container, \stdClass $serviceA = null): \stdClass
     {
         $serviceA->newProperty = 'foo';
         return $serviceA;
