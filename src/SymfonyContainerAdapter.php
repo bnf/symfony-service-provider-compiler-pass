@@ -30,7 +30,7 @@ class SymfonyContainerAdapter implements ContainerInterface
     public function get($id)
     {
         // First, let's test if there is a parameter (parameters and services are the same thing in container/interop)
-        if ($this->container->hasParameter($id)) {
+        if ($this->container->getParameterBag() && $this->container->hasParameter($id)) {
             return $this->container->getParameter($id);
         }
         try {
@@ -44,6 +44,6 @@ class SymfonyContainerAdapter implements ContainerInterface
 
     public function has($id)
     {
-        return $this->container->has($id) || $this->container->hasParameter($id);
+        return $this->container->has($id) || ($this->container->getParameterBag() && $this->container->hasParameter($id));
     }
 }
