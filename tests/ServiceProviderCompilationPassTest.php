@@ -1,7 +1,7 @@
 <?php
 
 
-namespace TheCodingMachine\Interop\ServiceProviderBridgeBundle;
+namespace TheCodingMachine\Interop\ServiceProviderBridgeBundle\Tests;
 
 
 use PHPUnit\Framework\TestCase;
@@ -9,6 +9,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use TheCodingMachine\Interop\ServiceProviderBridgeBundle\InteropServiceProviderBridgeBundle;
 use TheCodingMachine\Interop\ServiceProviderBridgeBundle\Tests\Fixtures\TestServiceProvider;
 use TheCodingMachine\Interop\ServiceProviderBridgeBundle\Tests\Fixtures\TestServiceProviderOverride;
 use TheCodingMachine\Interop\ServiceProviderBridgeBundle\Tests\Fixtures\TestServiceProviderOverride2;

@@ -26,6 +26,9 @@
     "autoload": {
         "psr-4": { "TheCodingMachine\\Interop\\ServiceProviderBridgeBundle\\": "src/" }
     },
+    "autoload-dev": {
+        "psr-4": { "TheCodingMachine\\Interop\\ServiceProviderBridgeBundle\\Tests\\": "tests/" }
+    },
     "minimum-stability": "dev",
     "prefer-stable": true
 }
