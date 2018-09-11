@@ -4,6 +4,7 @@
 namespace TheCodingMachine\Interop\ServiceProviderBridgeBundle;
 
 
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -12,7 +13,7 @@ use TheCodingMachine\Interop\ServiceProviderBridgeBundle\Tests\Fixtures\TestServ
 use TheCodingMachine\Interop\ServiceProviderBridgeBundle\Tests\Fixtures\TestServiceProviderOverride;
 use TheCodingMachine\Interop\ServiceProviderBridgeBundle\Tests\Fixtures\TestServiceProviderOverride2;
 
-class ServiceProviderCompilationPassTest extends \PHPUnit_Framework_TestCase
+class ServiceProviderCompilationPassTest extends TestCase
 {
     protected function getContainer(array $lazyArray, $useDiscovery = false)
     {

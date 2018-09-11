@@ -4,10 +4,11 @@
 namespace TheCodingMachine\Interop\ServiceProviderBridgeBundle;
 
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class SymfonyContainerAdapterTest extends \PHPUnit_Framework_TestCase
+class SymfonyContainerAdapterTest extends TestCase
 {
 
     public function testContainer()
