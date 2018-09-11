@@ -23,6 +23,11 @@ class TestServiceProviderOverride2 implements ServiceProviderInterface
     {
         return [
             'serviceA' => [self::class, 'overrideServiceA'],
+            'serviceC' => function(ContainerInterface $container, \stdClass $instance): \stdClass {
+                $instance->serviceB = $container->get('serviceB');
+
+                return $instance;
+            },
         ];
     }
 }

@@ -50,10 +50,12 @@ class ServiceProviderCompilationPassTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $serviceA = $container->get('serviceA');
+        $serviceC = $container->get('serviceC');
 
         $this->assertInstanceOf(\stdClass::class, $serviceA);
         $this->assertEquals('foo', $serviceA->newProperty);
         $this->assertEquals('bar', $serviceA->newProperty2);
+        $this->assertEquals('localhost', $serviceC->serviceB->parameter);
     }
 
     /**

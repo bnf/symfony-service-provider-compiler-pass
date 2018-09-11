@@ -21,6 +21,9 @@ class TestServiceProvider implements ServiceProviderInterface
                 return $instance;
             },
             'serviceB' => [ TestServiceProvider::class, 'createServiceB' ],
+            'serviceC' => function (ContainerInterface $container): \stdClass {
+                return new \stdClass();
+            },
             'function' => 'TheCodingMachine\\Interop\\ServiceProviderBridgeBundle\\Tests\\Fixtures\\myFunctionFactory'
         ];
     }
