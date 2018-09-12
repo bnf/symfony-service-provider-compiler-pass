@@ -1,7 +1,7 @@
 <?php
 namespace TheCodingMachine\Interop\ServiceProviderBridgeBundle\Tests\Fixtures;
 
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Interop\Container\ServiceProviderInterface;
 
 function myFunctionFactory()

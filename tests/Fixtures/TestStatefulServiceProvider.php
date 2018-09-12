@@ -2,7 +2,6 @@
 
 namespace TheCodingMachine\Interop\ServiceProviderBridgeBundle\Tests\Fixtures;
 
-use Interop\Container\ServiceProvider;
 use Interop\Container\ServiceProviderInterface;
 
 class TestStatefulServiceProvider implements ServiceProviderInterface

@@ -4,7 +4,7 @@ namespace TheCodingMachine\Interop\ServiceProviderBridgeBundle;
 
 use TheCodingMachine\Interop\ServiceProviderBridgeBundle\Exception\ContainerException as BridgeContainerException;
 use TheCodingMachine\Interop\ServiceProviderBridgeBundle\Exception\NotFoundException as BridgeNotFoundException;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException as SymfonyNotFoundException;
 
