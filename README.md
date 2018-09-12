@@ -26,13 +26,8 @@ Add `TheCodingMachine\Interop\ServiceProviderBridgeBundle\InteropServiceProvider
 ```
 
 
-### Usage using thecodingmachine/discovery
-
-The bridge bundle will use thecodingmachine/discvoery to automatically discover the service providers of your project. If the service provider you are loading publishes itself
-on Discovery, then you are done. The services declared in the service provider are available in the Symfony container!
-
 ### Usage using manual declaration
- 
+
 If the service provider you are using does not publishes itself using thecodingmachine/discovery, you will have to declare it manually in the constructor of the bundle.
 
 **AppKernel.php**

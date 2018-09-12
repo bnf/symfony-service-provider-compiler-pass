@@ -14,14 +14,13 @@
         "symfony/dependency-injection": "^4.1",
         "symfony/http-kernel": "^4.1",
         "container-interop/service-provider": "~0.4.0",
-        "thecodingmachine/service-provider-registry": "^3.0",
         "thecodingmachine/common-factories": "^0.4",
-        "thecodingmachine/discovery": "^1.2",
         "container-interop/container-interop": "^1.2"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.5 || ^7.0",
-        "php-coveralls/php-coveralls": "^2.0"
+        "php-coveralls/php-coveralls": "^2.0",
+        "bnf/di": "^0.1.2"
     },
     "autoload": {
         "psr-4": { "TheCodingMachine\\Interop\\ServiceProviderBridgeBundle\\": "src/" }

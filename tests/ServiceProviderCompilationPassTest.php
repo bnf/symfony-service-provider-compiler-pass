@@ -72,17 +72,4 @@ class ServiceProviderCompilationPassTest extends TestCase
         $bundle->build($container);
         $container->compile();
     }*/
-
-    /**
-     *
-     */
-    public function testTcmDiscovery()
-    {
-        // If TCM discovery is enabled, the CommonAliasesServiceProvider is registered.
-        $container = $this->getContainer([], true);
-
-        $logger = $container->get(LoggerInterface::class);
-
-        $this->assertInstanceOf(LoggerInterface::class, $logger);
-    }
 }

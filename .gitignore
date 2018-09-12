@@ -1,5 +1,4 @@
 *~
 vendor/
-.discovery/
 composer.lock
 build/
