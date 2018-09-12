@@ -19,18 +19,12 @@ class InteropServiceProviderBridgeBundle extends Bundle implements RegistryProvi
     private $id;
 
     /**
-     * @var int
-     */
-    private static $count = 0;
-
-    /**
      * @param array $serviceProviders An array of service providers, in the format specified in bnf/service-provider-registry: https://github.com/bnf/service-provider-registry#how-does-it-work
      */
-    public function __construct(array $serviceProviders = [])
+    public function __construct(array $serviceProviders = [], int $id = 0)
     {
         $this->serviceProviders = $serviceProviders;
-        $this->id = self::$count;
-        self::$count++;
+        $this->id = $id;
     }
 
     public function build(ContainerBuilder $container)

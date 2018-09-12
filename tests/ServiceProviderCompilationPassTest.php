@@ -14,9 +14,9 @@ use Symfony\Component\DependencyInjection\Definition;
 
 class ServiceProviderCompilationPassTest extends TestCase
 {
-    protected function getContainer(array $lazyArray, $useDiscovery = false)
+    protected function getContainer(array $lazyArray)
     {
-        $bundle = new InteropServiceProviderBridgeBundle($lazyArray, $useDiscovery);
+        $bundle = new InteropServiceProviderBridgeBundle($lazyArray);
 
         $container = new ContainerBuilder();
         $logger = new Definition(NullLogger::class);
