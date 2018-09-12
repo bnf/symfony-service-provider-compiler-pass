@@ -24,6 +24,11 @@ class TestServiceProvider implements ServiceProviderInterface
             'serviceC' => function (ContainerInterface $container): \stdClass {
                 return new \stdClass();
             },
+            'serviceD' => new class {
+                public function __invoke(ContainerInterface $container): \stdClass {
+                    return new \stdClass();
+                }
+            },
             'function' => 'Bnf\\Interop\\ServiceProviderBridgeBundle\\Tests\\Fixtures\\myFunctionFactory'
         ];
     }

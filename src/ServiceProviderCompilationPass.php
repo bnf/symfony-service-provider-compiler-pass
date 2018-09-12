@@ -6,7 +6,6 @@ namespace Bnf\Interop\ServiceProviderBridgeBundle;
 
 use Interop\Container\ServiceProviderInterface;
 use Symfony\Component\DependencyInjection\Alias;
-use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -111,64 +110,50 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
             // TODO: plug the definition-interop converter here!
         }*/
 
+        $finalServiceName = $serviceName;
         $innerName = null;
-        $decoratedServiceName = null;
+
         $factoryDefinition = new Definition($this->getReturnType($callable, $serviceName));
         $factoryDefinition->setPublic(true);
+
         if ($extension && $container->has($serviceName)) {
-            // TODO: Use a ChildDefinition? $factoryDefinition = new ChildDefinition($serviceName);
-            list($decoratedServiceName, $previousServiceName) = $this->getDecoratedServiceName($serviceName, $container);
-            $innerName = $decoratedServiceName . '.inner';
+            list($finalServiceName, $previousServiceName) = $this->getDecoratedServiceName($serviceName, $container);
+            $innerName = $finalServiceName . '.inner';
 
             $factoryDefinition->setDecoratedService($previousServiceName, $innerName);
         }
 
-        $containerDefinition = new Reference('service_container');
-
         if ((is_array($callable) && is_string($callable[0])) || is_string($callable)) {
             $factoryDefinition->setFactory($callable);
-            $factoryDefinition->addArgument($containerDefinition);
         } else {
             $registryMethod = $extension ? 'extendService' : 'createService';
             $factoryDefinition->setFactory([ new Reference('service_provider_registry_'.$this->registryId), $registryMethod ]);
             $factoryDefinition->addArgument($serviceProviderKey);
             $factoryDefinition->addArgument($serviceName);
-            $factoryDefinition->addArgument($containerDefinition);
         }
 
-        if ($innerName) {
+        $factoryDefinition->addArgument(new Reference('service_container'));
+        if ($innerName !== null) {
             $factoryDefinition->addArgument(new Reference($innerName));
         }
 
-        if ($decoratedServiceName) {
-            $container->setDefinition($decoratedServiceName, $factoryDefinition);
-        } else {
-            $container->setDefinition($serviceName, $factoryDefinition);
-        }
-
-        return $factoryDefinition;
+        $container->setDefinition($finalServiceName, $factoryDefinition);
     }
 
     private function getReturnType(callable $callable, string $serviceName): string
     {
-        $reflection = null;
-        if (is_array($callable)) {
-            $reflection = new \ReflectionMethod($callable[0], $callable[1]);
-        } elseif (is_object($callable)) {
-            if ($callable instanceof \Closure) {
-                $reflection = new \ReflectionFunction($callable);
-            } else {
-                $reflection = new \ReflectionMethod($callable, '__invoke');
-            }
-        } elseif (is_string($callable)) {
-            $reflection = new \ReflectionFunction($callable);
+        return $this->getReflection($callable)->getReturnType() ?: $serviceName;
+    }
+
+    private function getReflection(callable $callable): \ReflectionFunctionAbstract
+    {
+        if (is_array($callable) && count($callable) === 2) {
+            return new \ReflectionMethod($callable[0], $callable[1]);
+        }
+        if (is_object($callable) && !$callable instanceof \Closure) {
+            return new \ReflectionMethod($callable, '__invoke');
         }
 
-        if ($reflection && ($returnType = $reflection->getReturnType())) {
-            return (string) $returnType;
-        }
-
-        // If we cannot reflect a return type, assume the serviceName is the FQCN
-        return $serviceName;
+        return new \ReflectionFunction($callable);
     }
 }

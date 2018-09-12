@@ -4,6 +4,7 @@
 namespace Bnf\Interop\ServiceProviderBridgeBundle\Tests;
 
 
+use Interop\Container\ServiceProviderInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -39,8 +40,10 @@ class ServiceProviderCompilationPassTest extends TestCase
         ]);
 
         $serviceA = $container->get('serviceA');
+        $serviceD = $container->get('serviceD');
 
         $this->assertInstanceOf(\stdClass::class, $serviceA);
+        $this->assertInstanceOf(\stdClass::class, $serviceD);
         $this->assertEquals(42, $container->get('function'));
     }
 
@@ -59,6 +62,31 @@ class ServiceProviderCompilationPassTest extends TestCase
         $this->assertEquals('foo', $serviceA->newProperty);
         $this->assertEquals('bar', $serviceA->newProperty2);
         $this->assertEquals('localhost', $serviceC->serviceB->parameter);
+    }
+
+    /**
+     * @expectedException \TypeError
+     */
+    public function testExceptionForInvalidFactories()
+    {
+        $bundle = new InteropServiceProviderBridgeBundle([
+            new class implements ServiceProviderInterface {
+                public function getFactories()
+                {
+                    return [
+                        'invalid' => 2
+                    ];
+                }
+                public function getExtensions()
+                {
+                    return [];
+                }
+
+            }
+        ]);
+        $container = new ContainerBuilder();
+        $bundle->build($container);
+        $container->compile();
     }
 
     /**
