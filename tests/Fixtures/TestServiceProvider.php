@@ -31,8 +31,7 @@ class TestServiceProvider implements ServiceProviderInterface
     public static function createServiceB(ContainerInterface $container): \stdClass
     {
         $instance = new \stdClass();
-        // Test getting the database_host parameter.
-        $instance->parameter = $container->get('database_host');
+        $instance->parameter = 'localhost';
         return $instance;
     }
 

@@ -21,7 +21,6 @@ class ServiceProviderCompilationPassTest extends TestCase
         $bundle = new InteropServiceProviderBridgeBundle($lazyArray, $useDiscovery);
 
         $container = new ContainerBuilder();
-        $container->setParameter('database_host', 'localhost');
         $logger = new Definition(NullLogger::class);
         $logger->setPublic(true);
         $container->setDefinition('logger', $logger);
