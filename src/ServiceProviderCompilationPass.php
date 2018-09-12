@@ -90,7 +90,7 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
     }
 
     private function extendService($serviceName, $serviceProviderKey, $callable, ContainerBuilder $container) {
-        $this->addServiceDefinitionFromCallable($serviceName, $serviceProviderKey, $callable, $container, true);
+        $this->addServiceDefinitionFromCallable($serviceName, $serviceProviderKey, $callable, $container, 'extendService');
     }
 
     private function getDecoratedServiceName($serviceName, ContainerBuilder $container) {
@@ -104,19 +104,15 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
         ];
     }
 
-    private function addServiceDefinitionFromCallable($serviceName, $serviceProviderKey, callable $callable, ContainerBuilder $container, bool $extension = false)
+    private function addServiceDefinitionFromCallable($serviceName, $serviceProviderKey, callable $callable, ContainerBuilder $container, string $method = 'createService')
     {
-        /*if ($callable instanceof DefinitionInterface) {
-            // TODO: plug the definition-interop converter here!
-        }*/
-
         $finalServiceName = $serviceName;
         $innerName = null;
 
         $factoryDefinition = new Definition($this->getReturnType($callable, $serviceName));
         $factoryDefinition->setPublic(true);
 
-        if ($extension && $container->has($serviceName)) {
+        if ($method === 'extendService' && $container->has($serviceName)) {
             list($finalServiceName, $previousServiceName) = $this->getDecoratedServiceName($serviceName, $container);
             $innerName = $finalServiceName . '.inner';
 
@@ -126,8 +122,7 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
         if ((is_array($callable) && is_string($callable[0])) || is_string($callable)) {
             $factoryDefinition->setFactory($callable);
         } else {
-            $registryMethod = $extension ? 'extendService' : 'createService';
-            $factoryDefinition->setFactory([ new Reference('service_provider_registry_'.$this->registryId), $registryMethod ]);
+            $factoryDefinition->setFactory([ new Reference('service_provider_registry_'.$this->registryId), $method ]);
             $factoryDefinition->addArgument($serviceProviderKey);
             $factoryDefinition->addArgument($serviceName);
         }
