@@ -60,11 +60,9 @@ class Registry implements \ArrayAccess, \Iterator
      * @param string|object $className The FQCN or the instance to put in the array
      * @param array ...$params The parameters passed to the constructor.
      *
-     * @return int The key in the array
-     *
      * @throws \InvalidArgumentException
      */
-    public function push($className, ...$params): int
+    public function push($className, ...$params)
     {
         if ($className instanceof ServiceProviderInterface) {
             $this->lazyArray[] = $className;
@@ -73,9 +71,6 @@ class Registry implements \ArrayAccess, \Iterator
         } else {
             throw new \InvalidArgumentException('Push expects first parameter to be a fully qualified class name or an instance of Interop\\Container\\ServiceProviderInterface');
         }
-        end($this->lazyArray);
-
-        return key($this->lazyArray);
     }
 
     /**

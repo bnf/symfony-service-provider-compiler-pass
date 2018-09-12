@@ -64,7 +64,8 @@ class ServiceProviderRegistryTest extends TestCase
     {
         $registry = new Registry();
 
-        $key = $registry->push(TestStatefulServiceProvider::class, 42);
+        $registry->push(TestStatefulServiceProvider::class, 42);
+        $key = 0;
         $this->assertArrayHasKey($key, $registry);
         $this->assertInstanceOf(TestStatefulServiceProvider::class, $registry[$key]);
         $this->assertEquals(42, $registry[$key]->foo);
@@ -74,9 +75,9 @@ class ServiceProviderRegistryTest extends TestCase
     {
         $registry = new Registry();
 
-        $key = $registry->push(new TestRegistryServiceProvider());
-        $this->assertArrayHasKey($key, $registry);
-        $this->assertInstanceOf(TestRegistryServiceProvider::class, $registry[$key]);
+        $provider = new TestRegistryServiceProvider();
+        $registry->push($provider);
+        $this->assertContains($provider, $registry);
     }
 
     /**
