@@ -1,8 +1,8 @@
 <?php
 namespace Bnf\Interop\ServiceProviderBridgeBundle\Tests\Fixtures;
 
-use Psr\Container\ContainerInterface;
 use Interop\Container\ServiceProviderInterface;
+use Psr\Container\ContainerInterface;
 
 function myFunctionFactory()
 {
@@ -25,7 +25,8 @@ class TestServiceProvider implements ServiceProviderInterface
                 return new \stdClass();
             },
             'serviceD' => new class {
-                public function __invoke(ContainerInterface $container): \stdClass {
+                public function __invoke(ContainerInterface $container): \stdClass
+                {
                     return new \stdClass();
                 }
             },

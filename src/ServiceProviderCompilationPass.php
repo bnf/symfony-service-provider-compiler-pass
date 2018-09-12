@@ -1,11 +1,8 @@
 <?php
 
-
 namespace Bnf\Interop\ServiceProviderBridgeBundle;
 
-
 use Interop\Container\ServiceProviderInterface;
-use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -59,17 +56,17 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
         }
     }
 
-
     private function registerRegistry(ContainerBuilder $container)
     {
         $definition = new Definition(Registry::class);
         $definition->setSynthetic(true);
         $definition->setPublic(true);
 
-        $container->setDefinition('service_provider_registry_'.$this->registryId, $definition);
+        $container->setDefinition('service_provider_registry_' . $this->registryId, $definition);
     }
 
-    private function registerFactories($serviceProviderKey, ServiceProviderInterface $serviceProvider, ContainerBuilder $container) {
+    private function registerFactories($serviceProviderKey, ServiceProviderInterface $serviceProvider, ContainerBuilder $container)
+    {
         $serviceFactories = $serviceProvider->getFactories();
 
         foreach ($serviceFactories as $serviceName => $callable) {
@@ -77,7 +74,8 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
         }
     }
 
-    private function registerExtensions($serviceProviderKey, ServiceProviderInterface $serviceProvider, ContainerBuilder $container) {
+    private function registerExtensions($serviceProviderKey, ServiceProviderInterface $serviceProvider, ContainerBuilder $container)
+    {
         $serviceFactories = $serviceProvider->getExtensions();
 
         foreach ($serviceFactories as $serviceName => $callable) {
@@ -85,22 +83,25 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
         }
     }
 
-    private function registerService($serviceName, $serviceProviderKey, $callable, ContainerBuilder $container) {
+    private function registerService($serviceName, $serviceProviderKey, $callable, ContainerBuilder $container)
+    {
         $this->addServiceDefinitionFromCallable($serviceName, $serviceProviderKey, $callable, $container);
     }
 
-    private function extendService($serviceName, $serviceProviderKey, $callable, ContainerBuilder $container) {
+    private function extendService($serviceName, $serviceProviderKey, $callable, ContainerBuilder $container)
+    {
         $this->addServiceDefinitionFromCallable($serviceName, $serviceProviderKey, $callable, $container, 'extendService');
     }
 
-    private function getDecoratedServiceName($serviceName, ContainerBuilder $container) {
+    private function getDecoratedServiceName($serviceName, ContainerBuilder $container)
+    {
         $counter = 1;
-        while ($container->has($serviceName.'_decorated_'.$counter)) {
+        while ($container->has($serviceName . '_decorated_' . $counter)) {
             $counter++;
         }
         return [
-            $serviceName.'_decorated_'.$counter,
-            $counter === 1 ? $serviceName : $serviceName.'_decorated_'.($counter-1)
+            $serviceName . '_decorated_' . $counter,
+            $counter === 1 ? $serviceName : $serviceName . '_decorated_' . ($counter-1)
         ];
     }
 
@@ -122,7 +123,7 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
         if ($this->isStaticallyCallable($callable)) {
             $factoryDefinition->setFactory(/** @scrutinizer ignore-type */$callable);
         } else {
-            $factoryDefinition->setFactory([ new Reference('service_provider_registry_'.$this->registryId), $method ]);
+            $factoryDefinition->setFactory([ new Reference('service_provider_registry_' . $this->registryId), $method ]);
             $factoryDefinition->addArgument($serviceProviderKey);
             $factoryDefinition->addArgument($serviceName);
         }

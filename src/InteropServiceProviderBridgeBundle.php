@@ -44,7 +44,7 @@ class InteropServiceProviderBridgeBundle extends Bundle implements RegistryProvi
      */
     public function boot()
     {
-        $registryServiceName = 'service_provider_registry_'.$this->id;
+        $registryServiceName = 'service_provider_registry_' . $this->id;
         $this->container->set($registryServiceName, $this->getRegistry($this->container));
     }
 

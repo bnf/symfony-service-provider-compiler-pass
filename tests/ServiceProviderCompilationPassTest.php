@@ -1,19 +1,16 @@
 <?php
 
-
 namespace Bnf\Interop\ServiceProviderBridgeBundle\Tests;
 
-
-use Interop\Container\ServiceProviderInterface;
-use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Bnf\Interop\ServiceProviderBridgeBundle\InteropServiceProviderBridgeBundle;
 use Bnf\Interop\ServiceProviderBridgeBundle\Tests\Fixtures\TestServiceProvider;
 use Bnf\Interop\ServiceProviderBridgeBundle\Tests\Fixtures\TestServiceProviderOverride;
 use Bnf\Interop\ServiceProviderBridgeBundle\Tests\Fixtures\TestServiceProviderOverride2;
+use Interop\Container\ServiceProviderInterface;
+use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 class ServiceProviderCompilationPassTest extends TestCase
 {
@@ -81,7 +78,6 @@ class ServiceProviderCompilationPassTest extends TestCase
                 {
                     return [];
                 }
-
             }
         ]);
         $container = new ContainerBuilder();

@@ -2,8 +2,8 @@
 
 namespace Bnf\Interop\ServiceProviderBridgeBundle;
 
-use Psr\Container\ContainerInterface;
 use Interop\Container\ServiceProviderInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * A class that holds the list of service providers of a project.
@@ -111,28 +111,27 @@ class Registry implements \ArrayAccess, \Iterator
     {
         if (isset($this->constructedArray[$offset])) {
             return $this->constructedArray[$offset];
-        } else {
-            $item = $this->lazyArray[$offset];
-            if ($item instanceof ServiceProviderInterface) {
-                $this->constructedArray[$offset] = $item;
-
-                return $item;
-            }
-
-            if (is_array($item)) {
-                $className = $item[0];
-                $params = isset($item[1]) ? $item[1] : [];
-            } elseif (is_string($item)) {
-                $className = $item;
-                $params = [];
-            } else {
-                throw new \InvalidArgumentException('lazyArray elements are expected to be a fully qualified class name or an instance of Interop\\Container\\ServiceProviderInterface');
-            }
-
-            $this->constructedArray[$offset] = new $className(...$params);
-
-            return $this->constructedArray[$offset];
         }
+        $item = $this->lazyArray[$offset];
+        if ($item instanceof ServiceProviderInterface) {
+            $this->constructedArray[$offset] = $item;
+
+            return $item;
+        }
+
+        if (is_array($item)) {
+            $className = $item[0];
+            $params = isset($item[1]) ? $item[1] : [];
+        } elseif (is_string($item)) {
+            $className = $item;
+            $params = [];
+        } else {
+            throw new \InvalidArgumentException('lazyArray elements are expected to be a fully qualified class name or an instance of Interop\\Container\\ServiceProviderInterface');
+        }
+
+        $this->constructedArray[$offset] = new $className(...$params);
+
+        return $this->constructedArray[$offset];
     }
 
     /**
@@ -178,7 +177,7 @@ class Registry implements \ArrayAccess, \Iterator
      *
      * @return array
      */
-    public function getFactories($offset) : array
+    public function getFactories($offset): array
     {
         if (!isset($this->serviceFactories[$offset])) {
             $this->serviceFactories[$offset] = $this->offsetGet($offset)->getFactories();
@@ -195,7 +194,7 @@ class Registry implements \ArrayAccess, \Iterator
      *
      * @return array
      */
-    public function getExtensions($offset) : array
+    public function getExtensions($offset): array
     {
         if (!isset($this->serviceExtensions[$offset])) {
             $this->serviceExtensions[$offset] = $this->offsetGet($offset)->getExtensions();
