@@ -1,6 +1,6 @@
 <?php
 
-namespace TheCodingMachine\Interop\ServiceProviderBridgeBundle;
+namespace Bnf\Interop\ServiceProviderBridgeBundle;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -14,7 +14,7 @@ class InteropServiceProviderBridgeBundle extends Bundle implements RegistryProvi
     private static $count = 0;
 
     /**
-     * @param array $serviceProviders An array of service providers, in the format specified in thecodingmachine/service-provider-registry: https://github.com/thecodingmachine/service-provider-registry#how-does-it-work
+     * @param array $serviceProviders An array of service providers, in the format specified in bnf/service-provider-registry: https://github.com/bnf/service-provider-registry#how-does-it-work
      */
     public function __construct(array $serviceProviders = [])
     {

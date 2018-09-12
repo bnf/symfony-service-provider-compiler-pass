@@ -1,8 +1,8 @@
 <?php
-namespace TheCodingMachine\Interop\ServiceProviderBridgeBundle;
+namespace Bnf\Interop\ServiceProviderBridgeBundle;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use TheCodingMachine\ServiceProvider\RegistryInterface;
+use Bnf\ServiceProvider\RegistryInterface;
 
 /**
  * Provides a service provider registry.

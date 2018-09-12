@@ -1,12 +1,12 @@
 <?php
 
-namespace TheCodingMachine\Interop\ServiceProviderBridgeBundle\Tests;
+namespace Bnf\Interop\ServiceProviderBridgeBundle\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Bnf\Di\Container;
-use TheCodingMachine\Interop\ServiceProviderBridgeBundle\Registry;
-use TheCodingMachine\Interop\ServiceProviderBridgeBundle\Tests\Fixtures\TestRegistryServiceProvider;
-use TheCodingMachine\Interop\ServiceProviderBridgeBundle\Tests\Fixtures\TestStatefulServiceProvider;
+use Bnf\Interop\ServiceProviderBridgeBundle\Registry;
+use Bnf\Interop\ServiceProviderBridgeBundle\Tests\Fixtures\TestRegistryServiceProvider;
+use Bnf\Interop\ServiceProviderBridgeBundle\Tests\Fixtures\TestStatefulServiceProvider;
 
 class ServiceProviderRegistryTest extends TestCase
 {

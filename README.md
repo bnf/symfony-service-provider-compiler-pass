@@ -1,17 +1,21 @@
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/thecodingmachine/service-provider-bridge-bundle/badges/quality-score.png?b=1.0)](https://scrutinizer-ci.com/g/thecodingmachine/service-provider-bridge-bundle/?branch=1.0)
-[![Build Status](https://travis-ci.org/thecodingmachine/service-provider-bridge-bundle.svg?branch=1.0)](https://travis-ci.org/thecodingmachine/service-provider-bridge-bundle)
-[![Coverage Status](https://coveralls.io/repos/thecodingmachine/service-provider-bridge-bundle/badge.svg?branch=1.0&service=github)](https://coveralls.io/github/thecodingmachine/service-provider-bridge-bundle?branch=1.0)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/bnf/service-provider-bridge-bundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/bnf/service-provider-bridge-bundle/?branch=master)
+[![Build Status](https://travis-ci.org/bnf/service-provider-bridge-bundle.svg?branch=master)](https://travis-ci.org/bnf/service-provider-bridge-bundle)
+[![Coverage Status](https://coveralls.io/repos/bnf/service-provider-bridge-bundle/badge.svg?branch=master&service=github)](https://coveralls.io/github/bnf/service-provider-bridge-bundle?branch=master)
 
 
 # container-interop/service-provider bridge bundle
 
 Import `service-provider` as defined in `container-interop` into a Symfony application.
 
+*This is a fork of
+[thecodingmachine/service-provider-bridge-bundle](https://github.com/thecodingmachine/service-provider-bridge-bundle)
+to support Symfony 4. Credits go to David Négrier.*
+
 ## Usage
 
 ### Installation
 
-Add `TheCodingMachine\Interop\ServiceProviderBridgeBundle\InteropServiceProviderBridgeBundle` in your kernel (the `app/AppKernel.php` file).
+Add `Bnf\Interop\ServiceProviderBridgeBundle\InteropServiceProviderBridgeBundle` in your kernel (the `app/AppKernel.php` file).
 
 **AppKernel.php**
 ```php
@@ -19,16 +23,16 @@ Add `TheCodingMachine\Interop\ServiceProviderBridgeBundle\InteropServiceProvider
     {
         $bundles = [
             ...
-            new \TheCodingMachine\Interop\ServiceProviderBridgeBundle\InteropServiceProviderBridgeBundle()
+            new \Bnf\Interop\ServiceProviderBridgeBundle\InteropServiceProviderBridgeBundle()
         ];
         ...
     }
 ```
 
 
-### Usage using manual declaration
+### Usage
 
-If the service provider you are using does not publishes itself using thecodingmachine/discovery, you will have to declare it manually in the constructor of the bundle.
+You have to declare service providers manually in the constructor of the bundle.
 
 **AppKernel.php**
 ```php
@@ -38,7 +42,7 @@ class AppKernel extends Kernel
     {
         $bundles = [
             ...
-            new \TheCodingMachine\Interop\ServiceProviderBridgeBundle\InteropServiceProviderBridgeBundle([
+            new \Bnf\Interop\ServiceProviderBridgeBundle\InteropServiceProviderBridgeBundle([
                 new MyServiceProvide1(),
                 new MyServiceProvide2()
             ])
@@ -48,7 +52,7 @@ class AppKernel extends Kernel
 }
 ```
 
-Alternatively, you can also pass the service provider class name. This is interesting because the service-locator bundle will not instantiate the service provider unless it is needed for a service.
+Alternatively, you can also pass the service provider class name. This is interesting because the service-provider bundle will not instantiate the service provider unless it is needed for a service.
 You can therefore improve performances of your application.
 
 **AppKernel.php**
@@ -57,8 +61,7 @@ You can therefore improve performances of your application.
     {
         $bundles = [
             ...
-            new \Puli\SymfonyBundle\PuliBundle(),
-            new \TheCodingMachine\Interop\ServiceProviderBridgeBundle\InteropServiceProviderBridgeBundle([
+            new \Bnf\Interop\ServiceProviderBridgeBundle\InteropServiceProviderBridgeBundle([
                 MyServiceProvide1::class,
                 MyServiceProvide2::class
             ])
@@ -75,8 +78,7 @@ Finally, if you need to pass parameters to the constructors of the service provi
     {
         $bundles = [
             ...
-            new \Puli\SymfonyBundle\PuliBundle(),
-            new \TheCodingMachine\Interop\ServiceProviderBridgeBundle\InteropServiceProviderBridgeBundle([
+            new \Bnf\Interop\ServiceProviderBridgeBundle\InteropServiceProviderBridgeBundle([
                 [ MyServiceProvide1::class, [ "param1", "param2" ] ],
                 [ MyServiceProvide2::class, [ 42 ] ],
             ])
@@ -84,32 +86,3 @@ Finally, if you need to pass parameters to the constructors of the service provi
         ...
     }
 ```
-
-## Disabling thecodingmachine/discovery
-
-You can disable Discovery by passing `false` as the second argument of the bundle:
-
-**AppKernel.php**
-```php
-    public function registerBundles()
-    {
-        $bundles = [
-            ...
-            // false is passed as second argument. Puli discovery will be disabled.
-            new \TheCodingMachine\Interop\ServiceProviderBridgeBundle\InteropServiceProviderBridgeBundle([
-                ...
-            ], false)
-        ];
-        ...
-    }
-```
-
-## Default aliases
-
-By default, this package provides a `CommonAliasesServiceProvider` that will create the following aliases:
-
-- `logger` => `Psr\Log\LoggerInterface`
-- `cache.app` => `Psr\Cache\CacheItemPoolInterface`
-- `twig` => `Twig_Environment`
-
-This is useful because most service providers expect entries to be available by class/interface name.

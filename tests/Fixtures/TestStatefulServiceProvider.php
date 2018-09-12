@@ -1,6 +1,6 @@
 <?php
 
-namespace TheCodingMachine\Interop\ServiceProviderBridgeBundle\Tests\Fixtures;
+namespace Bnf\Interop\ServiceProviderBridgeBundle\Tests\Fixtures;
 
 use Interop\Container\ServiceProviderInterface;
 

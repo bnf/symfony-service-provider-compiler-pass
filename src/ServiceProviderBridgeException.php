@@ -1,7 +1,7 @@
 <?php
 
 
-namespace TheCodingMachine\Interop\ServiceProviderBridgeBundle;
+namespace Bnf\Interop\ServiceProviderBridgeBundle;
 
 
 class ServiceProviderBridgeException extends \RuntimeException

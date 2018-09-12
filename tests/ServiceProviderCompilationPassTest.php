@@ -1,7 +1,7 @@
 <?php
 
 
-namespace TheCodingMachine\Interop\ServiceProviderBridgeBundle\Tests;
+namespace Bnf\Interop\ServiceProviderBridgeBundle\Tests;
 
 
 use PHPUnit\Framework\TestCase;
@@ -9,10 +9,10 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use TheCodingMachine\Interop\ServiceProviderBridgeBundle\InteropServiceProviderBridgeBundle;
-use TheCodingMachine\Interop\ServiceProviderBridgeBundle\Tests\Fixtures\TestServiceProvider;
-use TheCodingMachine\Interop\ServiceProviderBridgeBundle\Tests\Fixtures\TestServiceProviderOverride;
-use TheCodingMachine\Interop\ServiceProviderBridgeBundle\Tests\Fixtures\TestServiceProviderOverride2;
+use Bnf\Interop\ServiceProviderBridgeBundle\InteropServiceProviderBridgeBundle;
+use Bnf\Interop\ServiceProviderBridgeBundle\Tests\Fixtures\TestServiceProvider;
+use Bnf\Interop\ServiceProviderBridgeBundle\Tests\Fixtures\TestServiceProviderOverride;
+use Bnf\Interop\ServiceProviderBridgeBundle\Tests\Fixtures\TestServiceProviderOverride2;
 
 class ServiceProviderCompilationPassTest extends TestCase
 {
@@ -62,7 +62,7 @@ class ServiceProviderCompilationPassTest extends TestCase
     }
 
     /**
-     * @expectedException \TheCodingMachine\Interop\ServiceProviderBridgeBundle\Exception\InvalidArgumentException
+     * @expectedException \Bnf\Interop\ServiceProviderBridgeBundle\Exception\InvalidArgumentException
      */
     /*public function testExceptionMessageIfNoPuliBundle()
     {

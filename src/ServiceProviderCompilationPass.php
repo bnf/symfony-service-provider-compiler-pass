@@ -1,7 +1,7 @@
 <?php
 
 
-namespace TheCodingMachine\Interop\ServiceProviderBridgeBundle;
+namespace Bnf\Interop\ServiceProviderBridgeBundle;
 
 
 use Interop\Container\ServiceProviderInterface;

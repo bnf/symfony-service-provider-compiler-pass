@@ -1,5 +1,5 @@
 <?php
-namespace TheCodingMachine\Interop\ServiceProviderBridgeBundle\Tests\Fixtures;
+namespace Bnf\Interop\ServiceProviderBridgeBundle\Tests\Fixtures;
 
 use Psr\Container\ContainerInterface;
 use Interop\Container\ServiceProviderInterface;
@@ -24,7 +24,7 @@ class TestServiceProvider implements ServiceProviderInterface
             'serviceC' => function (ContainerInterface $container): \stdClass {
                 return new \stdClass();
             },
-            'function' => 'TheCodingMachine\\Interop\\ServiceProviderBridgeBundle\\Tests\\Fixtures\\myFunctionFactory'
+            'function' => 'Bnf\\Interop\\ServiceProviderBridgeBundle\\Tests\\Fixtures\\myFunctionFactory'
         ];
     }
 
