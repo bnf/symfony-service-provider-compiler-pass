@@ -90,6 +90,16 @@ class ServiceProviderRegistryTest extends TestCase
     }
 
     /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testOffsetGetException()
+    {
+        $registry = new Registry([1]);
+
+        $registry->offsetGet(0);
+    }
+
+    /**
      * @expectedException \LogicException
      */
     public function testSet()

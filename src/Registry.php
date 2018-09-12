@@ -122,12 +122,16 @@ class Registry implements \ArrayAccess, \Iterator
                 $this->constructedArray[$offset] = $item;
 
                 return $item;
-            } elseif (is_array($item)) {
+            }
+
+            if (is_array($item)) {
                 $className = $item[0];
                 $params = isset($item[1]) ? $item[1] : [];
             } elseif (is_string($item)) {
                 $className = $item;
                 $params = [];
+            } else {
+                throw new \InvalidArgumentException('lazyArray elements are expected to be a fully qualified class name or an instance of Interop\\Container\\ServiceProviderInterface');
             }
 
             $this->constructedArray[$offset] = new $className(...$params);

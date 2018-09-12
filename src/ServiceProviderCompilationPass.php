@@ -14,15 +14,21 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ServiceProviderCompilationPass implements CompilerPassInterface
 {
+    /**
+     * @var int
+     */
     private $registryId;
 
+    /**
+     * @var RegistryProviderInterface
+     */
     private $registryProvider;
 
     /**
      * @param int $registryId
      * @param RegistryProviderInterface $registryProvider
      */
-    public function __construct($registryId, RegistryProviderInterface $registryProvider)
+    public function __construct(int $registryId, RegistryProviderInterface $registryProvider)
     {
         $this->registryId = $registryId;
         $this->registryProvider = $registryProvider;

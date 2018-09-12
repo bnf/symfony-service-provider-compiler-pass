@@ -8,9 +8,19 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class InteropServiceProviderBridgeBundle extends Bundle implements RegistryProviderInterface
 {
+    /**
+     * @var array
+     */
     private $serviceProviders;
+
+    /**
+     * @var int
+     */
     private $id;
 
+    /**
+     * @var int
+     */
     private static $count = 0;
 
     /**
@@ -42,7 +52,7 @@ class InteropServiceProviderBridgeBundle extends Bundle implements RegistryProvi
      * @param ContainerInterface $container
      * @return Registry
      */
-    public function getRegistry(ContainerInterface $container)
+    public function getRegistry(ContainerInterface $container): Registry
     {
         // In parallel, let's merge the registry:
         return new Registry($this->serviceProviders);

@@ -2,7 +2,6 @@
 namespace Bnf\Interop\ServiceProviderBridgeBundle;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Bnf\ServiceProvider\RegistryInterface;
 
 /**
  * Provides a service provider registry.
@@ -11,7 +10,7 @@ interface RegistryProviderInterface
 {
     /**
      * @param ContainerInterface $container
-     * @return RegistryInterface
+     * @return Registry
      */
-    public function getRegistry(ContainerInterface $container);
+    public function getRegistry(ContainerInterface $container): Registry;
 }
