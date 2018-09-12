@@ -120,7 +120,7 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
         }
 
         if ($this->isStaticallyCallable($callable)) {
-            $factoryDefinition->setFactory($callable);
+            $factoryDefinition->setFactory(/** @scrutinizer ignore-type */$callable);
         } else {
             $factoryDefinition->setFactory([ new Reference('service_provider_registry_'.$this->registryId), $method ]);
             $factoryDefinition->addArgument($serviceProviderKey);
