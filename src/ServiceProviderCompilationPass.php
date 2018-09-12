@@ -105,25 +105,9 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
             // TODO: plug the definition-interop converter here!
         }*/
 
-        $reflection = null;
-        if (is_array($callable)) {
-            $reflection = new \ReflectionMethod($callable[0], $callable[1]);
-        } elseif (is_object($callable)) {
-            if ($callable instanceof \Closure) {
-                $reflection = new \ReflectionFunction($callable);
-            } else {
-                $reflection = new \ReflectionMethod($callable, '__invoke');
-            }
-        } elseif (is_string($callable)) {
-            $reflection = new \ReflectionFunction($callable);
-        }
-
-        // If we cannot reflect a return type, assume the serviceName is the FQCN
-        $type = $reflection ? ((string) $reflection->getReturnType() ?: $serviceName) : $serviceName;
-
         $innerName = null;
         $decoratedServiceName = null;
-        $factoryDefinition = new Definition($type);
+        $factoryDefinition = new Definition($this->getReturnType($callable, $serviceName));
         $factoryDefinition->setPublic(true);
         if ($extension && $container->has($serviceName)) {
             // TODO: Use a ChildDefinition? $factoryDefinition = new ChildDefinition($serviceName);
@@ -157,5 +141,28 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
         }
 
         return $factoryDefinition;
+    }
+
+    private function getReturnType(callable $callable, string $serviceName): string
+    {
+        $reflection = null;
+        if (is_array($callable)) {
+            $reflection = new \ReflectionMethod($callable[0], $callable[1]);
+        } elseif (is_object($callable)) {
+            if ($callable instanceof \Closure) {
+                $reflection = new \ReflectionFunction($callable);
+            } else {
+                $reflection = new \ReflectionMethod($callable, '__invoke');
+            }
+        } elseif (is_string($callable)) {
+            $reflection = new \ReflectionFunction($callable);
+        }
+
+        if ($reflection && ($returnType = $reflection->getReturnType())) {
+            return (string) $returnType;
+        }
+
+        // If we cannot reflect a return type, assume the serviceName is the FQCN
+        return $serviceName;
     }
 }
