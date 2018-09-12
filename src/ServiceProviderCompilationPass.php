@@ -119,7 +119,7 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
             $factoryDefinition->setDecoratedService($previousServiceName, $innerName);
         }
 
-        if ((is_array($callable) && is_string($callable[0])) || is_string($callable)) {
+        if ($this->isStaticallyCallable($callable)) {
             $factoryDefinition->setFactory($callable);
         } else {
             $factoryDefinition->setFactory([ new Reference('service_provider_registry_'.$this->registryId), $method ]);
@@ -133,6 +133,11 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
         }
 
         $container->setDefinition($finalServiceName, $factoryDefinition);
+    }
+
+    private function isStaticallyCallable(callable $callable): bool
+    {
+        return (is_array($callable) && is_string($callable[0])) || is_string($callable);
     }
 
     private function getReturnType(callable $callable, string $serviceName): string
