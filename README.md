@@ -13,75 +13,42 @@ to support Symfony 4. Credits go to David Négrier.*
 
 ## Usage
 
-### Installation
-
-Add `Bnf\SymfonyServiceProviderCompilerPass\InteropServiceProviderCompilerPass` in your kernel (the `app/AppKernel.php` file).
+You have to declare service providers manually in the constructor of the registry.
 
 ```php
-    public function registerBundles()
-    {
-        $bundles = [
-            ...
-            new \Bnf\SymfonyServiceProviderCompilerPass\InteropServiceProviderCompilerPass()
-        ];
-        ...
-    }
+$registry = new \Bnf\SymfonyServiceProviderCompilerPass\Registry([
+    new MyServiceProvide1(),
+    new MyServiceProvide2()
+]);
+// during compilation set:
+$container->addCompilerPass(new \Bnf\SymfonyServiceProviderCompilerPass\Registry($registry, 'service_provider_registry'));
+$container->compile();
+$container->set('service_provider_registry', $registry);
 ```
 
-
-### Usage
-
-You have to declare service providers manually in the constructor of the bundle.
-
-**AppKernel.php**
-```php
-class AppKernel extends Kernel
-{
-    public function registerBundles()
-    {
-        $bundles = [
-            ...
-            new \Bnf\SymfonyServiceProviderCompilerPass\InteropServiceProviderCompilerPass([
-                new MyServiceProvide1(),
-                new MyServiceProvide2()
-            ])
-        ];
-        ...
-    }
-}
-```
-
-Alternatively, you can also pass the service provider class name. This is interesting because the service-provider bundle will not instantiate the service provider unless it is needed for a service.
+Alternatively, you can also pass the service provider class name. This is interesting because the service-provider registry will not instantiate the service provider unless it is needed for a service.
 You can therefore improve performances of your application.
 
-**AppKernel.php**
 ```php
-    public function registerBundles()
-    {
-        $bundles = [
-            ...
-            new \Bnf\SymfonyServiceProviderCompilerPass\InteropServiceProviderCompilerPass([
-                MyServiceProvide1::class,
-                MyServiceProvide2::class
-            ])
-        ];
-        ...
-    }
+$registry = new \Bnf\SymfonyServiceProviderCompilerPass\Registry([
+    MyServiceProvide1::class,
+    MyServiceProvide2::class
+]);
+// during compilation set:
+$container->addCompilerPass(new \Bnf\SymfonyServiceProviderCompilerPass\Registry($registry, 'service_provider_registry'));
+$container->compile();
+$container->set('service_provider_registry', $registry);
 ```
 
 Finally, if you need to pass parameters to the constructors of the service providers, you can do this by passing an array:
 
-**AppKernel.php**
 ```php
-    public function registerBundles()
-    {
-        $bundles = [
-            ...
-            new \Bnf\SymfonyServiceProviderCompilerPass\InteropServiceProviderCompilerPass([
-                [ MyServiceProvide1::class, [ "param1", "param2" ] ],
-                [ MyServiceProvide2::class, [ 42 ] ],
-            ])
-        ];
-        ...
-    }
+$registry = new \Bnf\SymfonyServiceProviderCompilerPass\Registry([
+    [ MyServiceProvide1::class, [ "param1", "param2" ] ],
+    [ MyServiceProvide2::class, [ 42 ] ],
+]);
+// during compilation set:
+$container->addCompilerPass(new \Bnf\SymfonyServiceProviderCompilerPass\Registry($registry, 'service_provider_registry'));
+$container->compile();
+$container->set('service_provider_registry', $registry);
 ```

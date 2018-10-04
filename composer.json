@@ -1,6 +1,6 @@
 {
     "name": "bnf/symfony-service-provider-compiler-pass",
-    "description": "This compiler pass allows Symfony applications to use service providers as defined in container-interop/service-provider",
+    "description": "Symfony compiler pass that allows to use service providers as defined in container-interop/service-provider",
     "keywords": ["PSR-11", "Symfony", "container-interop", "service-provider"],
     "license": "MIT",
     "authors": [
