@@ -1,11 +1,11 @@
 <?php
 
-namespace Bnf\Interop\ServiceProviderBridgeBundle\Tests;
+namespace Bnf\SymfonyServiceProviderCompilerPass\Tests;
 
 use Bnf\Di\Container;
-use Bnf\Interop\ServiceProviderBridgeBundle\Registry;
-use Bnf\Interop\ServiceProviderBridgeBundle\Tests\Fixtures\TestRegistryServiceProvider;
-use Bnf\Interop\ServiceProviderBridgeBundle\Tests\Fixtures\TestStatefulServiceProvider;
+use Bnf\SymfonyServiceProviderCompilerPass\Registry;
+use Bnf\SymfonyServiceProviderCompilerPass\Tests\Fixtures\TestRegistryServiceProvider;
+use Bnf\SymfonyServiceProviderCompilerPass\Tests\Fixtures\TestStatefulServiceProvider;
 use PHPUnit\Framework\TestCase;
 
 class ServiceProviderRegistryTest extends TestCase

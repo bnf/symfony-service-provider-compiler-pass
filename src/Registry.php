@@ -1,6 +1,6 @@
 <?php
 
-namespace Bnf\Interop\ServiceProviderBridgeBundle;
+namespace Bnf\SymfonyServiceProviderCompilerPass;
 
 use Interop\Container\ServiceProviderInterface;
 use Psr\Container\ContainerInterface;

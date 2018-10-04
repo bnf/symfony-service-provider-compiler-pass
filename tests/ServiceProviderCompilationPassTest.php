@@ -1,11 +1,12 @@
 <?php
 
-namespace Bnf\Interop\ServiceProviderBridgeBundle\Tests;
+namespace Bnf\SymfonyServiceProviderCompilerPass\Tests;
 
-use Bnf\Interop\ServiceProviderBridgeBundle\InteropServiceProviderBridgeBundle;
-use Bnf\Interop\ServiceProviderBridgeBundle\Tests\Fixtures\TestServiceProvider;
-use Bnf\Interop\ServiceProviderBridgeBundle\Tests\Fixtures\TestServiceProviderOverride;
-use Bnf\Interop\ServiceProviderBridgeBundle\Tests\Fixtures\TestServiceProviderOverride2;
+use Bnf\SymfonyServiceProviderCompilerPass\Registry;
+use Bnf\SymfonyServiceProviderCompilerPass\ServiceProviderCompilationPass;
+use Bnf\SymfonyServiceProviderCompilerPass\Tests\Fixtures\TestServiceProvider;
+use Bnf\SymfonyServiceProviderCompilerPass\Tests\Fixtures\TestServiceProviderOverride;
+use Bnf\SymfonyServiceProviderCompilerPass\Tests\Fixtures\TestServiceProviderOverride2;
 use Interop\Container\ServiceProviderInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -16,17 +17,19 @@ class ServiceProviderCompilationPassTest extends TestCase
 {
     protected function getContainer(array $lazyArray)
     {
-        $bundle = new InteropServiceProviderBridgeBundle($lazyArray);
+        static $id = 0;
+        $registry = new Registry($lazyArray);
+        $registryServiceName = 'service_provider_registry_' . ++$id;
 
         $container = new ContainerBuilder();
         $logger = new Definition(NullLogger::class);
         $logger->setPublic(true);
         $container->setDefinition('logger', $logger);
 
-        $bundle->build($container);
+        $container->addCompilerPass(new ServiceProviderCompilationPass($registry, $registryServiceName));
         $container->compile();
-        $bundle->setContainer($container);
-        $bundle->boot();
+        $container->set($registryServiceName, $registry);
+
         return $container;
     }
 
@@ -66,7 +69,7 @@ class ServiceProviderCompilationPassTest extends TestCase
      */
     public function testExceptionForInvalidFactories()
     {
-        $bundle = new InteropServiceProviderBridgeBundle([
+        $registry = new Registry([
             new class implements ServiceProviderInterface {
                 public function getFactories()
                 {
@@ -81,18 +84,8 @@ class ServiceProviderCompilationPassTest extends TestCase
             }
         ]);
         $container = new ContainerBuilder();
-        $bundle->build($container);
+        $registryServiceName = 'service_provider_registry_test';
+        $container->addCompilerPass(new ServiceProviderCompilationPass($registry, $registryServiceName));
         $container->compile();
     }
-
-    /**
-     * @expectedException \Bnf\Interop\ServiceProviderBridgeBundle\Exception\InvalidArgumentException
-     */
-    /*public function testExceptionMessageIfNoPuliBundle()
-    {
-        $bundle = new InteropServiceProviderBridgeBundle([], true);
-        $container = new ContainerBuilder();
-        $bundle->build($container);
-        $container->compile();
-    }*/
 }

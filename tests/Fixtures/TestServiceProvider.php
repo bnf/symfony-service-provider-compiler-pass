@@ -1,5 +1,5 @@
 <?php
-namespace Bnf\Interop\ServiceProviderBridgeBundle\Tests\Fixtures;
+namespace Bnf\SymfonyServiceProviderCompilerPass\Tests\Fixtures;
 
 use Interop\Container\ServiceProviderInterface;
 use Psr\Container\ContainerInterface;
@@ -30,7 +30,7 @@ class TestServiceProvider implements ServiceProviderInterface
                     return new \stdClass();
                 }
             },
-            'function' => 'Bnf\\Interop\\ServiceProviderBridgeBundle\\Tests\\Fixtures\\myFunctionFactory'
+            'function' => 'Bnf\\SymfonyServiceProviderCompilerPass\\Tests\\Fixtures\\myFunctionFactory'
         ];
     }
 

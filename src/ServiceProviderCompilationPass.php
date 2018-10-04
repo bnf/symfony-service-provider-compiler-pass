@@ -1,6 +1,6 @@
 <?php
 
-namespace Bnf\Interop\ServiceProviderBridgeBundle;
+namespace Bnf\SymfonyServiceProviderCompilerPass;
 
 use Interop\Container\ServiceProviderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -11,23 +11,23 @@ use Symfony\Component\DependencyInjection\Reference;
 class ServiceProviderCompilationPass implements CompilerPassInterface
 {
     /**
-     * @var int
+     * @var Registry
      */
-    private $registryId;
+    private $registry;
 
     /**
-     * @var RegistryProviderInterface
+     * @var string
      */
-    private $registryProvider;
+    private $registryServiceName;
 
     /**
-     * @param int $registryId
-     * @param RegistryProviderInterface $registryProvider
+     * @param Registry $registry
+     * @param string $registryServiceName
      */
-    public function __construct(int $registryId, RegistryProviderInterface $registryProvider)
+    public function __construct(Registry $registry, string $registryServiceName = 'service_provider_registry')
     {
-        $this->registryId = $registryId;
-        $this->registryProvider = $registryProvider;
+        $this->registry = $registry;
+        $this->registryServiceName = $registryServiceName;
     }
 
     /**
@@ -37,21 +37,14 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        // Now, let's store the registry in the container (an empty version of it... it will be dynamically added at runtime):
+        // Now, let's store the registry in the container (an empty version of it... it has to be dynamically added at runtime):
         $this->registerRegistry($container);
 
-        $registry = $this->registryProvider->getRegistry($container);
-
-        // Note: in the 'boot' method of a bundle, the container is available.
-        // We use that to push the lazy array in the container.
-        // The lazy array can be used by the registry that is also part of the container.
-        // The registry can itself be used by a factory that creates services!
-
-        foreach ($registry as $serviceProviderKey => $serviceProvider) {
+        foreach ($this->registry as $serviceProviderKey => $serviceProvider) {
             $this->registerFactories($serviceProviderKey, $serviceProvider, $container);
         }
 
-        foreach ($registry as $serviceProviderKey => $serviceProvider) {
+        foreach ($this->registry as $serviceProviderKey => $serviceProvider) {
             $this->registerExtensions($serviceProviderKey, $serviceProvider, $container);
         }
     }
@@ -62,7 +55,7 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
         $definition->setSynthetic(true);
         $definition->setPublic(true);
 
-        $container->setDefinition('service_provider_registry_' . $this->registryId, $definition);
+        $container->setDefinition($this->registryServiceName, $definition);
     }
 
     private function registerFactories($serviceProviderKey, ServiceProviderInterface $serviceProvider, ContainerBuilder $container)
@@ -123,7 +116,7 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
         if ($this->isStaticallyCallable($callable)) {
             $factoryDefinition->setFactory(/** @scrutinizer ignore-type */$callable);
         } else {
-            $factoryDefinition->setFactory([ new Reference('service_provider_registry_' . $this->registryId), $method ]);
+            $factoryDefinition->setFactory([ new Reference($this->registryServiceName), $method ]);
             $factoryDefinition->addArgument($serviceProviderKey);
             $factoryDefinition->addArgument($serviceName);
         }

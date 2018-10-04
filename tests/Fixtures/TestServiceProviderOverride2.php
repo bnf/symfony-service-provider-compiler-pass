@@ -1,6 +1,6 @@
 <?php
 
-namespace Bnf\Interop\ServiceProviderBridgeBundle\Tests\Fixtures;
+namespace Bnf\SymfonyServiceProviderCompilerPass\Tests\Fixtures;
 
 use Interop\Container\ServiceProviderInterface;
 use Psr\Container\ContainerInterface;
