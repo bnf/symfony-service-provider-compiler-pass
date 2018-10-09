@@ -131,6 +131,16 @@ class ServiceProviderCompilationPassTest extends TestCase
         $this->assertFalse($container->getDefinition('serviceB')->isAutowired());
     }
 
+    public function testExceptionForNonNullableExtensionArgument()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('A registered extension for the service "serviceA" requires the service to be available, which is missing.');
+
+        $container = $this->getContainer([
+            TestServiceProviderOverride::class,
+        ]);
+    }
+
     /**
      * @expectedException \TypeError
      */
