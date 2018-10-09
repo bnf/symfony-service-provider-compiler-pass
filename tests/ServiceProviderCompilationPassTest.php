@@ -105,6 +105,32 @@ class ServiceProviderCompilationPassTest extends TestCase
         $this->assertEquals('foobar', $serviceA->serviceB->symfony_defined_parameter);
     }
 
+    public function testServiceProviderFactoryOverrideResetsAutowiring()
+    {
+        $container = $this->getContainer(
+            [
+                TestServiceProvider::class,
+                TestServiceProviderFactoryOverride::class,
+            ],
+            function (ContainerBuilder $container) {
+                $definition = new \Symfony\Component\DependencyInjection\Definition('stdClass');
+                // property should be overriden by service provider
+                $definition->setProperty('parameter', 'remotehost');
+                // property should not be "deleted" by service provider
+                $definition->setProperty('symfony_defined_parameter', 'foobar');
+                $definition->setAutowired(true);
+                $container->setDefinition('serviceB', $definition);
+            }
+        );
+
+        $serviceA = $container->get('serviceA');
+
+        $this->assertInstanceOf(\stdClass::class, $serviceA);
+        $this->assertEquals('remotehost', $serviceA->serviceB->parameter);
+        $this->assertEquals('foobar', $serviceA->serviceB->symfony_defined_parameter);
+        $this->assertFalse($container->getDefinition('serviceB')->isAutowired());
+    }
+
     /**
      * @expectedException \TypeError
      */

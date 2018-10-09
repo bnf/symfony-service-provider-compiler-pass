@@ -87,6 +87,9 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
             // (which act like a service extension)
             // Retrieve the existing factory and overwrite it.
             $factoryDefinition = $container->findDefinition($serviceName);
+            if ($factoryDefinition->isAutowired()) {
+                $factoryDefinition->setAutowired(false);
+            }
         }
 
         $className = $this->getReturnType($this->getReflection($callable), $serviceName);
