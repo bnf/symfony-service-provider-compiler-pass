@@ -103,14 +103,19 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
         $finalServiceName = $serviceName;
         $innerName = null;
 
+        $reflection = $this->getReflection($callable);
         $factoryDefinition = new Definition($this->getReturnType($callable, $serviceName));
         $factoryDefinition->setPublic(true);
 
-        if ($method === 'extendService' && $container->has($serviceName)) {
-            list($finalServiceName, $previousServiceName) = $this->getDecoratedServiceName($serviceName, $container);
-            $innerName = $finalServiceName . '.inner';
+        if ($method === 'extendService') {
+            if ($container->has($serviceName)) {
+                list($finalServiceName, $previousServiceName) = $this->getDecoratedServiceName($serviceName, $container);
+                $innerName = $finalServiceName . '.inner';
 
-            $factoryDefinition->setDecoratedService($previousServiceName, $innerName);
+                $factoryDefinition->setDecoratedService($previousServiceName, $innerName);
+            } elseif ($reflection->getNumberOfRequiredParameters() > 1) {
+                throw new \Exception('A registered extension for the service "' . $serviceName . '" requires the service to be available, which is missing.');
+            }
         }
 
         $staticallyCallable = $this->getStaticallyCallable($callable);
