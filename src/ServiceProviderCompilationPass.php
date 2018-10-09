@@ -104,8 +104,11 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
         $innerName = null;
 
         $reflection = $this->getReflection($callable);
-        $factoryDefinition = new Definition($this->getReturnType($callable, $serviceName));
+        $className = $this->getReturnType($reflection, $serviceName);
+
+        $factoryDefinition = new Definition($className);
         $factoryDefinition->setPublic(true);
+        $setRequired = true;
 
         if ($method === 'extendService') {
             if ($container->has($serviceName)) {
@@ -116,6 +119,14 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
             } elseif ($reflection->getNumberOfRequiredParameters() > 1) {
                 throw new \Exception('A registered extension for the service "' . $serviceName . '" requires the service to be available, which is missing.');
             }
+        } elseif ($container->has($finalServiceName)) {
+            // Merge into an existing definition to keep possible addMethodCall/properties configurations (which act like a service extension)
+            // Retrieve the existing factory and overwrite it
+            $factoryDefinition = $container->findDefinition($finalServiceName);
+            $factoryDefinition->setPublic(true);
+            $factoryDefinition->setClass($className);
+            $factoryDefinition->setArguments([]);
+            $setRequired = false;
         }
 
         $staticallyCallable = $this->getStaticallyCallable($callable);
@@ -132,7 +143,10 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
             $factoryDefinition->addArgument(new Reference($innerName));
         }
 
-        $container->setDefinition($finalServiceName, $factoryDefinition);
+        if ($setRequired) {
+            $container->setDefinition($finalServiceName, $factoryDefinition);
+        }
+
     }
 
     /**
@@ -151,9 +165,9 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
         return null;
     }
 
-    private function getReturnType(callable $callable, string $serviceName): string
+    private function getReturnType(\ReflectionFunctionAbstract $reflection, string $serviceName): string
     {
-        return $this->getReflection($callable)->getReturnType() ?: $serviceName;
+        return $reflection->getReturnType() ?: $serviceName;
     }
 
     private function getReflection(callable $callable): \ReflectionFunctionAbstract

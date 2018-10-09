@@ -5,6 +5,7 @@ namespace Bnf\SymfonyServiceProviderCompilerPass\Tests;
 use Bnf\SymfonyServiceProviderCompilerPass\Registry;
 use Bnf\SymfonyServiceProviderCompilerPass\ServiceProviderCompilationPass;
 use Bnf\SymfonyServiceProviderCompilerPass\Tests\Fixtures\TestServiceProvider;
+use Bnf\SymfonyServiceProviderCompilerPass\Tests\Fixtures\TestServiceProviderFactoryOverride;
 use Bnf\SymfonyServiceProviderCompilerPass\Tests\Fixtures\TestServiceProviderOverride;
 use Bnf\SymfonyServiceProviderCompilerPass\Tests\Fixtures\TestServiceProviderOverride2;
 use Interop\Container\ServiceProviderInterface;
@@ -15,13 +16,16 @@ use Symfony\Component\DependencyInjection\Definition;
 
 class ServiceProviderCompilationPassTest extends TestCase
 {
-    protected function getContainer(array $lazyArray)
+    protected function getContainer(array $lazyArray, callable $configure = null)
     {
         static $id = 0;
         $registry = new Registry($lazyArray);
         $registryServiceName = 'service_provider_registry_' . ++$id;
 
         $container = new ContainerBuilder();
+        if ($configure !== null) {
+            $configure($container);
+        }
         $logger = new Definition(NullLogger::class);
         $logger->setPublic(true);
         $container->setDefinition('logger', $logger);
@@ -62,6 +66,43 @@ class ServiceProviderCompilationPassTest extends TestCase
         $this->assertEquals('foo', $serviceA->newProperty);
         $this->assertEquals('bar', $serviceA->newProperty2);
         $this->assertEquals('localhost', $serviceC->serviceB->parameter);
+    }
+
+    public function testServiceProviderFactoryOverrides()
+    {
+        $container = $this->getContainer([
+            TestServiceProvider::class,
+            TestServiceProviderFactoryOverride::class,
+        ]);
+
+        $serviceA = $container->get('serviceA');
+
+        $this->assertInstanceOf(\stdClass::class, $serviceA);
+        $this->assertEquals('remotehost', $serviceA->serviceB->parameter);
+    }
+
+    public function testServiceProviderFactoryOverridesForSymfonyDefinedServices()
+    {
+        $container = $this->getContainer(
+            [
+                TestServiceProvider::class,
+                TestServiceProviderFactoryOverride::class,
+            ],
+            function (ContainerBuilder $container) {
+                $definition = new \Symfony\Component\DependencyInjection\Definition('stdClass');
+                // property should be overriden by service provider
+                $definition->setProperty('parameter', 'remotehost');
+                // property should not be "deleted" by service provider
+                $definition->setProperty('symfony_defined_parameter', 'foobar');
+                $container->setDefinition('serviceB', $definition);
+            }
+        );
+
+        $serviceA = $container->get('serviceA');
+
+        $this->assertInstanceOf(\stdClass::class, $serviceA);
+        $this->assertEquals('remotehost', $serviceA->serviceB->parameter);
+        $this->assertEquals('foobar', $serviceA->serviceB->symfony_defined_parameter);
     }
 
     /**
