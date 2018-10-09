@@ -78,27 +78,38 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
 
     private function registerService($serviceName, $serviceProviderKey, $callable, ContainerBuilder $container)
     {
-        $this->addServiceDefinitionFromCallable($serviceName, $serviceProviderKey, $callable, $container);
+        if (!$container->has($serviceName)) {
+            // Create a new definition
+            $factoryDefinition = new Definition();
+            $container->setDefinition($serviceName, $factoryDefinition);
+        } else {
+            // Merge into an existing definition to keep possible addMethodCall/properties configurations
+            // (which act like a service extension)
+            // Retrieve the existing factory and overwrite it.
+            $factoryDefinition = $container->findDefinition($serviceName);
+        }
+
+        $className = $this->getReturnType($this->getReflection($callable), $serviceName);
+        $factoryDefinition->setClass($className);
+        $factoryDefinition->setPublic(true);
+
+        $staticallyCallable = $this->getStaticallyCallable($callable);
+        if ($staticallyCallable !== null) {
+            $factoryDefinition->setFactory($staticallyCallable);
+            $factoryDefinition->setArguments([
+                new Reference('service_container')
+            ]);
+        } else {
+            $factoryDefinition->setFactory([ new Reference($this->registryServiceName), 'createService' ]);
+            $factoryDefinition->setArguments([
+                $serviceProviderKey,
+                $serviceName,
+                new Reference('service_container')
+            ]);
+        }
     }
 
     private function extendService($serviceName, $serviceProviderKey, $callable, ContainerBuilder $container)
-    {
-        $this->addServiceDefinitionFromCallable($serviceName, $serviceProviderKey, $callable, $container, 'extendService');
-    }
-
-    private function getDecoratedServiceName($serviceName, ContainerBuilder $container)
-    {
-        $counter = 1;
-        while ($container->has($serviceName . '_decorated_' . $counter)) {
-            $counter++;
-        }
-        return [
-            $serviceName . '_decorated_' . $counter,
-            $counter === 1 ? $serviceName : $serviceName . '_decorated_' . ($counter-1)
-        ];
-    }
-
-    private function addServiceDefinitionFromCallable($serviceName, $serviceProviderKey, callable $callable, ContainerBuilder $container, string $method = 'createService')
     {
         $finalServiceName = $serviceName;
         $innerName = null;
@@ -107,46 +118,38 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
         $className = $this->getReturnType($reflection, $serviceName);
 
         $factoryDefinition = new Definition($className);
+        $factoryDefinition->setClass($className);
         $factoryDefinition->setPublic(true);
-        $setRequired = true;
 
-        if ($method === 'extendService') {
-            if ($container->has($serviceName)) {
-                list($finalServiceName, $previousServiceName) = $this->getDecoratedServiceName($serviceName, $container);
-                $innerName = $finalServiceName . '.inner';
+        if ($container->has($serviceName)) {
+            list($finalServiceName, $previousServiceName) = $this->getDecoratedServiceName($serviceName, $container);
+            $innerName = $finalServiceName . '.inner';
 
-                $factoryDefinition->setDecoratedService($previousServiceName, $innerName);
-            } elseif ($reflection->getNumberOfRequiredParameters() > 1) {
-                throw new \Exception('A registered extension for the service "' . $serviceName . '" requires the service to be available, which is missing.');
-            }
-        } elseif ($container->has($finalServiceName)) {
-            // Merge into an existing definition to keep possible addMethodCall/properties configurations (which act like a service extension)
-            // Retrieve the existing factory and overwrite it
-            $factoryDefinition = $container->findDefinition($finalServiceName);
-            $factoryDefinition->setPublic(true);
-            $factoryDefinition->setClass($className);
-            $factoryDefinition->setArguments([]);
-            $setRequired = false;
+            $factoryDefinition->setDecoratedService($previousServiceName, $innerName);
+        } elseif ($reflection->getNumberOfRequiredParameters() > 1) {
+            throw new \Exception('A registered extension for the service "' . $serviceName . '" requires the service to be available, which is missing.');
         }
 
         $staticallyCallable = $this->getStaticallyCallable($callable);
         if ($staticallyCallable !== null) {
             $factoryDefinition->setFactory($staticallyCallable);
+            $factoryDefinition->setArguments([
+                new Reference('service_container')
+            ]);
         } else {
-            $factoryDefinition->setFactory([ new Reference($this->registryServiceName), $method ]);
-            $factoryDefinition->addArgument($serviceProviderKey);
-            $factoryDefinition->addArgument($serviceName);
+            $factoryDefinition->setFactory([ new Reference($this->registryServiceName), 'extendService' ]);
+            $factoryDefinition->setArguments([
+                $serviceProviderKey,
+                $serviceName,
+                new Reference('service_container')
+            ]);
         }
 
-        $factoryDefinition->addArgument(new Reference('service_container'));
         if ($innerName !== null) {
             $factoryDefinition->addArgument(new Reference($innerName));
         }
 
-        if ($setRequired) {
-            $container->setDefinition($finalServiceName, $factoryDefinition);
-        }
-
+        $container->setDefinition($finalServiceName, $factoryDefinition);
     }
 
     /**
@@ -180,5 +183,17 @@ class ServiceProviderCompilationPass implements CompilerPassInterface
         }
 
         return new \ReflectionFunction($callable);
+    }
+
+    private function getDecoratedServiceName($serviceName, ContainerBuilder $container)
+    {
+        $counter = 1;
+        while ($container->has($serviceName . '_decorated_' . $counter)) {
+            $counter++;
+        }
+        return [
+            $serviceName . '_decorated_' . $counter,
+            $counter === 1 ? $serviceName : $serviceName . '_decorated_' . ($counter-1)
+        ];
     }
 }
