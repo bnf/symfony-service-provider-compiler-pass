@@ -1,6 +1,6 @@
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/bnf/symfony-service-provider-compiler-pass/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/bnf/symfony-service-provider-compiler-pass/?branch=master)
 [![Build Status](https://travis-ci.org/bnf/symfony-service-provider-compiler-pass.svg?branch=master)](https://travis-ci.org/bnf/symfony-service-provider-compiler-pass)
-[![Coverage Status](https://coveralls.io/repos/bnf/symfony-service-provider-compiler-pass/badge.svg?branch=master&service=github)](https://coveralls.io/github/bnf/symfony-service-provider-compiler-pass?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/bnf/symfony-service-provider-compiler-pass/badge.svg?branch=master)](https://coveralls.io/github/bnf/symfony-service-provider-compiler-pass?branch=master)
 
 
 # container-interop/service-provider compiler pass
